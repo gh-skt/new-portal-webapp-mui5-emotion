@@ -1,0 +1,18 @@
+
+7) Authorization and authentication
+
+1) Convert in to type script
+
+2) Add context to pass props which are not direct to pages -> since we using next ? will this be a performance hit?
+
+3) will redux solve deep props passing? store - action/listener 
+
+4) moving styles -> modules.scss, sytled components for dynamic styles, global scss
+
+5) Unit testing 
+
+6) Performance 
+
+
+
+
