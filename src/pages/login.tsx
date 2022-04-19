@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
   Divider,
   Avatar,
-  Button,
   Card,
   CardContent,
   Checkbox,
@@ -10,11 +9,12 @@ import {
   FormControlLabel,
   Grid,
   TextField,
+  Box,
   Typography,
   Switch,
-  Box,
   Alert,
 } from "@mui/material";
+import GHButton from "../components/common/UI/GHButton";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import PersonIcon from "@mui/icons-material/Person";
@@ -23,9 +23,11 @@ import Image from "next/image";
 import Link from "next/link";
 import styled from "@emotion/styled";
 import { useRouter } from "next/router";
+import { getSession, signIn } from "next-auth/client";
+import Cookies from "js-cookie";
+import { config } from "../config/config";
 
-const LoginWrapper = styled(Box)((props) => {
-  const { theme } = props;
+const LoginWrapper = styled(Box)(({ theme }: any) => {
   return {
     "& .root": {
       marginTop: theme.spacing(10),
@@ -45,13 +47,6 @@ const LoginWrapper = styled(Box)((props) => {
       width: "100%",
       marginTop: theme.spacing(1),
     },
-    "& .submit": {
-      margin: theme.spacing(3, 0, 2),
-      background: "linear-gradient(#007dc1,#0073b2)",
-      borderColor: "#004b75 #004b75 #00456a",
-      boxShadow: "0 1px 0 rgba(0,0,0,.15),inset 0 1px 0 0 hsla(0,0%,100%,.1)",
-      height: "50px",
-    },
     "& .errorAlert": {
       width: "100%",
       margin: theme.spacing(3),
@@ -64,11 +59,12 @@ const LoginWrapper = styled(Box)((props) => {
   };
 });
 
-const Login = ({ toggleTheme, themeMode }) => {
-  console.log("$$$$$$$$toggleTheme,themeMode**********");
-  console.log(toggleTheme, themeMode);
+const Login = (props) => {
+  console.log("Login props****", props);
+  const { toggleTheme, themeMode } = props;
   const [themeSwitch, setThemeSwitch] = useState(themeMode === "dark");
-  const [email, setEmail] = useState("");
+  const userName = Cookies.get("user") || "";
+  const [email, setEmail] = useState(userName);
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ email: "", password: "" });
   const [logInErrorMessage, setLogInErrorMessage] = useState("");
@@ -76,17 +72,99 @@ const Login = ({ toggleTheme, themeMode }) => {
   const [startSignIn, setStartSignIn] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    router.push({
-      pathname: '/dashboard',
-      query: {status: 'warning'}
-    })
-  };
-
   const handleToggle = (e) => {
     setThemeSwitch(e.target.checked);
     toggleTheme();
+  };
+
+  const generateRandomString = () => {
+    let text = "";
+    const possible =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+    for (let i = 0; i < 28; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
+  };
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    console.log("i am clicked ****** ❤️❤️❤️❤️❤️❤️ handleLogin");
+    setStartSignIn(true);
+    if (remember) {
+      Cookies.set("user", email, { expires: 1 });
+    } else {
+      Cookies.remove("user");
+    }
+    console.log("step 6 ****** ❤️❤️❤️❤️❤️❤️ handleLogin");
+    const isEmail = RegExp(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i);
+    console.log("email", email);
+    if (email === "" || !isEmail.test(email)) {
+      setErrors((prevState) => ({
+        ...prevState,
+        email: "Please enter valid username",
+      }));
+      setStartSignIn(false);
+      return;
+    }
+    console.log("step 5 ****** ❤️❤️❤️❤️❤️❤️ handleLogin");
+    if (password === "") {
+      setErrors((prevState) => ({
+        ...prevState,
+        password: "Please enter password",
+      }));
+      setStartSignIn(false);
+      return;
+    }
+    // we will remove below comment after backend implementation done for external users
+    // const isGuardant = email.includes('guardant');
+    const isGuardant = true;
+    console.log("step 1 ****** ❤️❤️❤️❤️❤️❤️ handleLogin");
+    let result: any;
+    if (isGuardant) {
+      result = await signIn("okta", {
+        email,
+        password,
+        callbackUrl: window.location.origin,
+        redirect: false,
+      });
+    } else {
+      result = await signIn("custom-credentials", {
+        email,
+        password,
+        callbackUrl: window.location.origin,
+        redirect: false,
+      });
+    }
+    console.log("step 2 ****** ❤️❤️❤️❤️❤️❤️ handleLogin");
+    if (result?.error) {
+      setStartSignIn(false);
+      setLogInErrorMessage("Unable to sign in");
+    }
+    if (result.url) {
+      console.log("url ****** ❤️❤️❤️❤️❤️❤️ handleLogin");
+      if (isGuardant) {
+        const session = await getSession().then(
+          (session) => session,
+          (err) => console.log(err)
+        );
+        if (session) {
+          const sessionToken = session && session.sessionToken;
+          const state = generateRandomString();
+          const query: URLSearchParams = new URLSearchParams();
+          query.set("client_id", encodeURIComponent(config.client_id));
+          query.set("response_type", "code");
+          query.set("state", encodeURIComponent(state));
+          // @ts-ignore
+          query.set("sessionToken", sessionToken);
+          const authURL = `${config.authorization_endpoint}?redirect_uri=${
+            config.redirect_uri
+          }&scope=${config.requested_scopes}&${query.toString()}`;
+          await router.push(authURL);
+        }
+      } else {
+        await router.push(result.url);
+      }
+    }
   };
 
   return (
@@ -102,7 +180,6 @@ const Login = ({ toggleTheme, themeMode }) => {
         <Card>
           <CardContent>
             <div className="paper">
-              <span>Hello world</span>
               <Image
                 src="/guardant-logo-with-text-564a398b2f545f7fb2a1c9e82542da7704e6d255991469e9806fb7147aa34ce6.svg"
                 alt="Guardant Logo"
@@ -135,6 +212,7 @@ const Login = ({ toggleTheme, themeMode }) => {
                   required
                   fullWidth
                   id="username"
+                  data-testid="username"
                   label="Username"
                   defaultValue={email}
                   autoComplete="email"
@@ -157,6 +235,7 @@ const Login = ({ toggleTheme, themeMode }) => {
                   label="Password"
                   type="password"
                   id="password"
+                  data-testid="password"
                   helperText={errors.password}
                   error={errors.password !== ""}
                   onChange={(e) => {
@@ -177,16 +256,19 @@ const Login = ({ toggleTheme, themeMode }) => {
                   }
                   label="Remember me"
                 />
-                <Button
+                <GHButton
                   type="submit"
                   fullWidth
                   variant="contained"
                   color="primary"
+                  size="large"
+                  data-testid="signIn"
                   disabled={startSignIn}
-                  className="submit"
+                  height="50px"
                 >
+                  {" "}
                   Sign In
-                </Button>
+                </GHButton>
                 <Grid container>
                   <Grid item xs>
                     <Link href="/forgot-password">

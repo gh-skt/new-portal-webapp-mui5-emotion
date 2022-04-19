@@ -1,6 +1,6 @@
 import getConfig from 'next/config';
 
-const { publicRuntimeConfig = {}} = getConfig()|| {};
+const { publicRuntimeConfig = {} } = getConfig();
 export const config = {
   client_id: publicRuntimeConfig.oktaClientId,
   client_secret: publicRuntimeConfig.oktaClientSecret,

@@ -16,3 +16,18 @@
 
 
 
+"https://guardant.oktapreview.com/oauth2/ausytvvodeTk4SoCl0h7/v1/authorize"
+
+
+'https://guardant.oktapreview.com/oauth2/ausytvvodeTk4SoCl0h7/v1/authorize?redirect_uri=http://localhost:3000/api/auth/callback&scope=openid
+ profile email&client_id=0oaytpvr52PpII1tS0h7&response_type=code&state=vCWwEQa.Rm8FkK1nunB_fQLoJuN1&sessionToken=20111q5jS1E4lUGODhH8H5VKyh-2E8pocYWQ3vzXXMOaFA7cw9vNDiQ'
+
+
+
+'https://guardant.oktapreview.com/oauth2/ausytvvodeTk4SoCl0h7/v1/authorize?redirect_uri=http://localhost:3000/api/auth/callback&scope=openid profile email&client_id=0oaytpvr52PpII1tS0h7&response_type=code&state=_-QSkDr.TwJCIKg1YNWbIEXHIPOg&sessionToken=20111e7b_vpbBVFIjNa9-hcS4GRN0gm_WyWKI43qPucWcbyuFG57jdg'
+
+
+
+
+"https://guardant.oktapreview.com/oauth2/ausytvvodeTk4SoCl0h7/v1/authorize?redirect_uri=http://localhost:3000/api/auth/callback&scope=openid profile email&client_id=0oaytpvr52PpII1tS0h7&response_type=code&state=UgjVha-0Rir8%7E8OHtgOYec7xY1Bc&sessionToken=201119hGlpuJfOT9Z8e0imyxqZ0HuXPHmn0gDTExRNVNA4osoLOGWDm"
+
