@@ -32,20 +32,20 @@ const MyApp = (props) => {
       localStorage.setItem("themeMode", themeMode);
   }, [themeMode]);
   return (
-    <CacheProvider value={emotionCache}>
-      <MuiThemeProvider theme={theme}>
-          <AuthProvider>
-            <NextAuthProvider session={pageProps.session}>
-              <CssBaseline />
-              <Component
-                {...pageProps}
-                toggleTheme={toggleTheme}
-                themeMode={themeMode}
-              />
-            </NextAuthProvider>
-          </AuthProvider>
-      </MuiThemeProvider>
-    </CacheProvider>
+    <AuthProvider>
+      <CacheProvider value={emotionCache}>
+        <MuiThemeProvider theme={theme}>
+          <NextAuthProvider session={pageProps.session}>
+            <CssBaseline />
+            <Component
+              {...pageProps}
+              toggleTheme={toggleTheme}
+              themeMode={themeMode}
+            />
+          </NextAuthProvider>
+        </MuiThemeProvider>
+      </CacheProvider>
+    </AuthProvider>
   );
 };
 

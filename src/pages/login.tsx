@@ -266,8 +266,7 @@ const Login = (props) => {
                   disabled={startSignIn}
                   height="50px"
                 >
-                  {" "}
-                  Sign In
+                  Sign Inn
                 </GHButton>
                 <Grid container>
                   <Grid item xs>

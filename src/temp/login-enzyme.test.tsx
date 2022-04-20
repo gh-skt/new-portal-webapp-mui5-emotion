@@ -1,10 +1,10 @@
 
 import {Card, CardContent, TextField} from "@mui/material";
-import GHButton from "../src/components/common/UI/GHButton";
+import GHButton from "../components/common/UI/GHButton";
 import { shallow } from 'enzyme';
 import Head from 'next/head';
 import Image from 'next/image';
-import Login from "../src/pages/Login";
+import Login from "../pages/Login";
 
 
 xdescribe('Enzyme Login Page', () => {

@@ -1,63 +1,49 @@
-import React from "react";
 import { useRouter } from "next/router";
+import { useAuth } from "../src/components/common/auth/context/AuthContext";
 import Login from "../src/pages/login";
-import { render } from "../src/utility/test-utils";
-import { act, fireEvent } from "@testing-library/react";
-import { signIn } from "next-auth/client";
-import {
-  useAuth,
-  useProvideAuth,
-} from "../src/components/common/auth/context/AuthContext";
+import { act, fireEvent, render } from "../src/utility/test-utils";
 
 jest.mock("next/router");
-jest.mock("../../src/components/common/auth/context/AuthContext");
+jest.mock("../src/components/common/auth/context/AuthContext");
 jest.mock("next-auth/client");
 
-xdescribe("Log In", () => {
-  let expectedSignIn,
-    expectedSignOut,
-    expectedEmail,
-    expectedPassword,
-    expectedRouterPush;
+describe("Log In", () => {
+  let expectedSignIn, expectedEmail, expectedPassword, expectedRouterPush;
   beforeEach(() => {
-    window.fetch = jest.fn();
     expectedRouterPush = jest.fn();
     expectedSignIn = jest.fn();
-    expectedSignOut = jest.fn();
     expectedSignIn.mockResolvedValue("");
     expectedEmail = "superghadmin@guardantdemo.com";
     expectedPassword = "Guardant@2021";
 
     useRouter.mockReturnValue({ push: expectedRouterPush });
-    useProvideAuth.mockReturnValue({
+    useAuth.mockReturnValue({
       user: 123,
-      LogOut: expectedSignOut,
       logIn: expectedSignIn,
     });
   });
 
-  it("should redirect on sign in", async () => {
-    const { getByTestId } = render(<Login />);
+  test("should redirect on sign in", async () => {
+    const { getByTestId, getByText } = render(<Login />);
     const email = getByTestId("username"); // can use screen.getByTestId also
     const password = getByTestId("password");
-    const signInButton = getByTestId("signIn");
+    const signInButton = getByText("Sign Inn");
 
     await act(async () => {
       fireEvent.change(email.querySelector("#username"), {
         target: { value: expectedEmail },
       });
-
-      expect(email.querySelector("#username").value).toBe(
-        "superghadmin@guardantdemo.com"
-      );
-
       fireEvent.change(password.querySelector("#password"), {
         target: { value: expectedPassword },
       });
-      expect(password.querySelector("#password").value).toBe("Guardant@2021");
       fireEvent.click(signInButton);
-      expect(expectedSignIn).toHaveBeenCalledTimes(1);
     });
+
+    expect(email.querySelector("#username").value).toBe(
+      "superghadmin@guardantdemo.com"
+    );
+    expect(password.querySelector("#password").value).toBe("Guardant@2021");
+    expect(expectedSignIn).toHaveBeenCalledTimes(1);
   });
 
   // expect(expectedSignIn).toHaveBeenCalledTimes(1);
